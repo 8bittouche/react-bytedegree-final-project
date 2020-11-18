@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import styles from './Book.module.css';
 import {
@@ -9,10 +9,10 @@ import {
 } from '@ant-design/icons';
 import { BookResType } from '../types';
 import { history } from '../redux/create';
+import { Link } from 'react-router-dom';
 
 interface BookProps extends BookResType {
   removeBookById: (bookId: number) => void;
-  setBookId: (bookId: number) => void;
 }
 
 // [project] 컨테이너에 작성된 함수를 컴포넌트에서 이용했다.
@@ -21,25 +21,16 @@ const Book: React.FC<BookProps> = ({
   author,
   bookId,
   createdAt,
-  message,
   title,
-  updatedAt,
   url,
   removeBookById,
-  setBookId,
 }) => {
   const edit = () => {
-    setBookId(bookId);
     history.push(`/edit/${bookId}`);
   };
 
   const remove = () => {
     removeBookById(bookId);
-  };
-
-  const detail = () => {
-    setBookId(bookId);
-    history.push(`/book/${bookId}`);
   };
 
   const getFormattedDate = (dateString: string) => {
@@ -70,23 +61,25 @@ const Book: React.FC<BookProps> = ({
     <>
       <div className={styles.book}>
         <div className={styles.title}>
-          <a className={styles.link_detail_title} onClick={detail}>
-            <BookOutlined className={styles.bookOutLined} />
+          <Link to={`/book/${bookId}`} className={styles.link_detail_title}>
+            <BookOutlined className={styles.bookOutlined} />
             {title}
-          </a>
+          </Link>
         </div>
         <div className={styles.author}>
-          <a className={styles.link_detail_author} onClick={detail}>
+          <Link to={`/book/${bookId}`} className={styles.link_detail_author}>
             {author}
-          </a>
+          </Link>
         </div>
         <div className={styles.created}>{createdDate}</div>
         <div className={styles.tooltips}>
-          <a href={url} className={styles.button_url}>
-            <HomeOutlined />
-          </a>
+          <button className={styles.button_url}>
+            <a href={url} className={styles.link_url}>
+              <HomeOutlined />
+            </a>
+          </button>
           <button className={styles.button_edit} onClick={edit}>
-            <EditOutlined />
+            <EditOutlined className={styles.editOutlined} />
           </button>
           <button className={styles.button_remove} onClick={remove}>
             <DeleteOutlined />

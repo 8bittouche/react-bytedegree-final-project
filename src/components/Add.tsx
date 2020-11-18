@@ -115,8 +115,8 @@ const Add: React.FC<AddProps> = ({ loading, logout, addBook }) => {
       title,
       message,
       author,
-      url
-    }
+      url,
+    };
     addBook(addedBook);
   }
 };

@@ -11,7 +11,7 @@
   padding-left: 10px;
 }
 
-.bookOutLined {
+.bookOutlined {
   margin-right: 3px;
 }
 
@@ -45,26 +45,50 @@
   vertical-align: middle;
   font-size: 14px;
   padding-left: 10px;
+  transition: 0.8s ease-in;
 }
 
 .link_url {
-  font-size: 12px;
+  font-size: 14px;
+  color: white;
 }
 
 .button_url {
+  background-color:#228be6;
+  color: white;
   margin-right: 5px;
+  border-radius: 50%;
+  border: none;
+  outline: none;
+  cursor: pointer;
 }
 
 .button_edit {
+  background-color: white;
+  color: black;
   margin-right: 5px;
   border-radius: 50%;
   border: none;
   outline: none;
+  cursor: pointer;
+}
+.button_edit:hover {
+  background-color: #f8f9fa;
+  color: #a5d8ff;
+}
+.editOutlined {
+  font-size: 16px;
 }
 
 .button_remove {
+  background-color: #fa5252;
+  color: white;
   margin-right: 5px;
   border-radius: 50%;
   border: none;
   outline: none;
+  cursor: pointer;
+}
+.button_remove:hover {
+  background-color: #ff8787;
 }

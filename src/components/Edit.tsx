@@ -137,7 +137,7 @@ const Edit: React.FC<EditProps> = ({ book, loading, logout, editBookById }) => {
       message,
       author,
       url,
-    }
+    };
 
     editBookById(book!.bookId, editedBook);
   }
