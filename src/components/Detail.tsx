@@ -5,6 +5,7 @@ import { BookOutlined } from '@ant-design/icons';
 import Layout from './Layout';
 import { BookResType } from '../types';
 import styles from './Detail.module.css';
+import { history } from '../redux/create';
 
 const { TextArea } = Input;
 
@@ -33,10 +34,10 @@ const Detail: React.FC<DetailProps> = ({ book, logout }) => {
       <PageHeader
         title={
           <div>
-            <BookOutlined /> {'book.title'}
+            <BookOutlined /> {book.title}
           </div>
         }
-        subTitle={'{book.author}'}
+        subTitle={book.author}
         extra={[
           <Button
             key="2"
@@ -64,7 +65,7 @@ const Detail: React.FC<DetailProps> = ({ book, logout }) => {
         <div className={styles.message}>
           <TextArea
             rows={4}
-            value={'{book.message}'}
+            value={book.message}
             readOnly
             className={styles.message_textarea}
           />
@@ -74,6 +75,8 @@ const Detail: React.FC<DetailProps> = ({ book, logout }) => {
     </Layout>
   );
 
-  function click() {}
+  function click() {
+    history.push(`/edit/${book!.bookId}`);
+  }
 };
 export default Detail;

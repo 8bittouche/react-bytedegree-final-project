@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Table, PageHeader, Button } from 'antd';
 
 import styles from './List.module.css';
@@ -11,11 +11,19 @@ interface BooksProps {
   loading: boolean;
   goAdd: () => void;
   logout: () => void;
+  getBookList: () => void;
+  removeBookById: (bookId: number) => void;
+  setBookId: (bookId: number) => void;
 }
 
 // [project] 컨테이너에 작성된 함수를 컴포넌트에서 이용했다.
 // [project] BookResType 의 응답 값을 이용하여, List 컴포넌트의 키를 처리했다.
-const Books: React.FC<BooksProps> = ({ books, loading, goAdd, logout }) => {
+const Books: React.FC<BooksProps> = ({ books, loading, goAdd, logout, getBookList, removeBookById, setBookId }) => {
+  
+  useEffect(() => {
+    getBookList();
+  }, []);
+
   return (
     <Layout>
       <PageHeader
@@ -48,7 +56,7 @@ const Books: React.FC<BooksProps> = ({ books, loading, goAdd, logout }) => {
             dataIndex: 'book',
             key: 'book',
             render: (text, record) => (
-              <Book {...record} key={'{record.bookId}'} />
+              <Book {...record} key={record.bookId} removeBookById={removeBookById} setBookId={setBookId} />
             ),
           },
         ]}
