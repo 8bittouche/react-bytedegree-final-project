@@ -10,6 +10,7 @@ import {
 import { BookResType } from '../types';
 import { history } from '../redux/create';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 
 interface BookProps extends BookResType {
   removeBookById: (bookId: number) => void;
@@ -33,30 +34,6 @@ const Book: React.FC<BookProps> = ({
     removeBookById(bookId);
   };
 
-  const getFormattedDate = (dateString: string) => {
-    const date = new Date(Date.parse(dateString));
-
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    let hours = date.getHours().toString();
-    let hoursNumber = parseInt(hours);
-    let minutes = date.getMinutes().toString();
-    let minutesNumber = parseInt(minutes);
-    const ampm = hoursNumber >= 12 ? 'pm' : 'am';
-
-    hoursNumber = hoursNumber % 12;
-    hoursNumber = hoursNumber === 0 ? 12 : hoursNumber;
-    hours = hoursNumber < 10 ? '0' + hoursNumber : hours;
-    minutes = minutesNumber < 10 ? '0' + minutesNumber : minutes;
-
-    return (
-      day + '-' + month + '-' + year + ' ' + hours + ':' + minutes + ' ' + ampm
-    );
-  };
-
-  const createdDate = getFormattedDate(createdAt);
-
   return (
     <>
       <div className={styles.book}>
@@ -71,7 +48,9 @@ const Book: React.FC<BookProps> = ({
             {author}
           </Link>
         </div>
-        <div className={styles.created}>{createdDate}</div>
+        <div className={styles.created}>
+          {moment(createdAt).format('MM-DD-YYYY hh:mm a')}
+        </div>
         <div className={styles.tooltips}>
           <button className={styles.button_url}>
             <a href={url} className={styles.link_url}>

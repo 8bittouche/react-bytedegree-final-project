@@ -27,7 +27,7 @@ const Books: React.FC<BooksProps> = ({
 }) => {
   useEffect(() => {
     getBookList();
-  }, []);
+  }, [getBookList]);
 
   return (
     <Layout>

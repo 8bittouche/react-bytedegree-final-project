@@ -1,9 +1,10 @@
 import { BookReqType } from './../../types';
 import { push } from 'connected-react-router';
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { call, put, takeEvery, select } from 'redux-saga/effects';
 import { handleActions, createActions } from 'redux-actions';
 import { BookResType } from '../../types';
 import BookService from '../../services/BookService';
+import { getBooksFromState, getTokenFromState } from '../utils';
 
 export interface BooksState {
   books: BookResType[] | null;
@@ -22,24 +23,31 @@ const options = {
 };
 
 // [project] redux-action 을 이용하여, books 모듈의 액션 생성 함수와 리듀서를 작성했다.
-export const booksActionCreator = createActions(
+export const {
+  success,
+  pending,
+  fail,
+  getBooks,
+  addBook,
+  editBook,
+  removeBook,
+} = createActions(
   {
-    SUCCESS: (data: BookResType | BookReqType | number, type: string) => ({
-      data,
+    SUCCESS: (books: BookResType[], type: string) => ({
+      books,
       type,
     }),
     FAIL: (error: Error) => error,
 
-    GET_BOOKS: (token: string) => ({ token }),
-    ADD_BOOK: (token: string, book: BookReqType) => ({ token, book }),
-    EDIT_BOOK: (token: string, bookId: number, book: BookReqType) => ({
-      token,
+    ADD_BOOK: (book: BookReqType) => ({ book }),
+    EDIT_BOOK: (bookId: number, book: BookReqType) => ({
       bookId,
       book,
     }),
-    REMOVE_BOOK: (token: string, bookId: number) => ({ token, bookId }),
+    REMOVE_BOOK: (bookId: number) => ({ bookId }),
   },
   'PENDING',
+  'GET_BOOKS',
   options,
 );
 
@@ -52,20 +60,7 @@ const reducer = handleActions<BooksState, any>(
     }),
     SUCCESS: (state, action) => ({
       ...state,
-      books:
-        action.payload.type === 'GET'
-          ? action.payload.data
-          : action.payload.type === 'ADD'
-          ? state.books?.concat(action.payload.data)
-          : action.payload.type === 'REMOVE'
-          ? state.books?.filter((book) => book.bookId !== action.payload.data)
-          : action.payload.type === 'EDIT'
-          ? state.books?.map((book) =>
-              book.bookId === action.payload.data.bookId
-                ? action.payload.data
-                : book,
-            )
-          : null,
+      books: action.payload.books,
       loading: false,
       error: null,
     }),
@@ -82,66 +77,68 @@ const reducer = handleActions<BooksState, any>(
 export default reducer;
 
 // [project] 책 목록을 가져오는 saga 함수를 작성했다.
-function* getBooksSaga(action: ReturnType<typeof booksActionCreator.getBooks>) {
+function* getBooksSaga(action: ReturnType<typeof getBooks>) {
   try {
-    yield put(booksActionCreator.pending());
-    const books: BookResType[] = yield call(
-      BookService.getBooks,
-      action.payload.token,
-    );
-    yield put(booksActionCreator.success(books, 'GET'));
+    yield put(pending());
+    const token: string = yield select(getTokenFromState);
+    const books: BookResType[] = yield call(BookService.getBooks, token);
+    yield put(success(books));
   } catch (error) {
-    yield put(booksActionCreator.fail(error));
+    yield put(fail(error));
   }
 }
 
 // [project] 책을 추가하는 saga 함수를 작성했다.
-function* addBookSaga(action: ReturnType<typeof booksActionCreator.addBook>) {
+function* addBookSaga(action: ReturnType<typeof addBook>) {
   try {
-    yield put(booksActionCreator.pending());
-    const book = yield call(
-      BookService.addBook,
-      action.payload.token,
-      action.payload.book,
-    );
-    yield put(booksActionCreator.success(book, 'ADD'));
+    yield put(pending());
+    const token: string = yield select(getTokenFromState);
+    const books: BookResType[] = yield select(getBooksFromState);
+    const book = yield call(BookService.addBook, token, action.payload.book);
+    yield put(success([...books, book]));
     yield put(push('/'));
   } catch (error) {
-    yield put(booksActionCreator.fail(error));
+    yield put(fail(error));
   }
 }
 
 // [project] 책을 삭제하는 saga 함수를 작성했다.
-function* removeBookSaga(
-  action: ReturnType<typeof booksActionCreator.removeBook>,
-) {
+function* removeBookSaga(action: ReturnType<typeof removeBook>) {
   try {
-    yield put(booksActionCreator.pending());
-    yield call(
-      BookService.deleteBook,
-      action.payload.token,
-      action.payload.bookId,
+    yield put(pending());
+    const token: string = yield select(getTokenFromState);
+    const books: BookResType[] = yield select(getBooksFromState);
+    yield call(BookService.deleteBook, token, action.payload.bookId);
+    yield put(
+      success(books.filter((book) => book.bookId !== action.payload.bookId)),
     );
-    yield put(booksActionCreator.success(action.payload.bookId, 'REMOVE'));
   } catch (error) {
-    yield put(booksActionCreator.fail(error));
+    yield put(fail(error));
   }
 }
 
 // [project] 책을 수정하는 saga 함수를 작성했다.
-function* editBookSaga(action: ReturnType<typeof booksActionCreator.editBook>) {
+function* editBookSaga(action: ReturnType<typeof editBook>) {
   try {
-    yield put(booksActionCreator.pending());
-    const book = yield call(
+    yield put(pending());
+    const token: string = yield select(getTokenFromState);
+    const books: BookResType[] = yield select(getBooksFromState);
+    const editedBook = yield call(
       BookService.editBook,
-      action.payload.token,
+      token,
       action.payload.bookId,
       action.payload.book,
     );
-    yield put(booksActionCreator.success(book, 'EDIT'));
+    yield put(
+      success(
+        books.map((book) =>
+          book.bookId === action.payload.bookId ? editedBook : book,
+        ),
+      ),
+    );
     yield put(push('/'));
   } catch (error) {
-    yield put(booksActionCreator.fail(error));
+    yield put(fail(error));
   }
 }
 
