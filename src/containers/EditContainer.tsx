@@ -23,7 +23,7 @@ const EditContainer = () => {
   const { books, loading } = useSelector((state: RootState) => state.books);
   const { id } = useParams<{ id?: string }>();
   const bookId = Number(id) || -1;
-  const book = books ? books?.find((book) => book.bookId === bookId) : null;
+  const book = books ? books.find((book) => book.bookId === bookId) : null;
 
   const editBookById = useCallback(
     (bookId: number, book: BookReqType) => {

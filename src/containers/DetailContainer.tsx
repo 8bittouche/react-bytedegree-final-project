@@ -6,7 +6,6 @@ import Detail from '../components/Detail';
 import { getBooks as getBooksSaga } from '../redux/modules/books';
 import { logout as logoutSaga } from '../redux/modules/auth';
 import { RootState } from '../redux/modules/rootReducer';
-import { BookResType } from '../types';
 
 const DetailContainer = () => {
   const dispatch = useDispatch();
@@ -20,9 +19,7 @@ const DetailContainer = () => {
   const { books } = useSelector((state: RootState) => state.books);
   const { id } = useParams<{ id?: string }>();
   const bookId = Number(id) || -1;
-  const book: BookResType | undefined | null = books?.find(
-    (book) => book.bookId === bookId,
-  );
+  const book = books ? books.find((book) => book.bookId === bookId) : null;
 
   useEffect(() => {
     if (books === null) {
